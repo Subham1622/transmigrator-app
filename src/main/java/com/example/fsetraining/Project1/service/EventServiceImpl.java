@@ -1,71 +1,60 @@
 package com.example.fsetraining.Project1.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.example.fsetraining.Project1.domain.event.EventId;
+import com.example.fsetraining.Project1.domain.event.CategoryType;
 import com.example.fsetraining.Project1.domain.event.MeaningFulEvent;
+import com.example.fsetraining.Project1.domain.event.SuggestionType;
+import com.example.fsetraining.Project1.repository.EventRepository;
 
 @Service
 public class EventServiceImpl implements EventService {
-
-private static List<MeaningFulEvent> events = new ArrayList<MeaningFulEvent>();
 	
-	static {
-		events.add(new MeaningFulEvent(
-				new EventId(1L),
-				"This is a demo event",
-				"Happy new year",
-				LocalDateTime.of(2024,4,1,10,0)
-				));
-        events.add(new MeaningFulEvent(
-        		new EventId(2L),
-                "Spring Boot Started",
-                "Learning Spring fundamentals",
-                LocalDateTime.of(2024, 4, 2, 10, 0)
-        ));
-
-        events.add(new MeaningFulEvent(
-        		new EventId(3L),
-                "REST API Understood",
-                "Controller and RequestParam",
-                LocalDateTime.of(2024, 4, 5, 15, 30)
-        ));
-
-        events.add(new MeaningFulEvent(
-        		new EventId(3L),
-                "Service Layer Added",
-                "Business logic separated",
-                LocalDateTime.of(2024, 4, 9, 9, 0)
-        ));
+	EventRepository eventRepository;
+	
+	Sort sort = Sort.by(Sort.Direction.DESC, "eventDateTime");
+	
+	public EventServiceImpl(EventRepository eventRepository) {
+		this.eventRepository = eventRepository;
 	}
-	
+
 	@Override
 	public List<MeaningFulEvent> getEventBetweenDate(LocalDateTime start , LocalDateTime end) {
-		
-//		List<MeaningFulEvent> eventBetweenDates = new ArrayList<MeaningFulEvent>();
-//		for(MeaningFulEvent event: events) {
-//			if(!event.getEventDateTime().isBefore(start) && !event.getEventDateTime().isAfter(end) ) {
-//				eventBetweenDates.add(event);
-//			}
-//		}
-//		return eventBetweenDates;
-		return events.stream().
-				filter(e -> !e.getEventDateTime().isBefore(start)).
-				filter(e -> !e.getEventDateTime().isAfter(end)).toList();
-		
+
+		return eventRepository.findByEventDateTimeBetween(start , end, sort);		
 	}
 	
 	@Override
-	public MeaningFulEvent getEventById(EventId eventId) {
-		for(MeaningFulEvent event : events) {
-			if(event.getId().equals(eventId)) {
-				return event;
-			}
-		}
-		throw new RuntimeException("Event not found for id :"+ eventId.getValue());
+	public MeaningFulEvent getEventById(Long eventId) {
+		return eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found for id: "+eventId));
+	}
+	
+	@Override
+	public void deleteById(Long eventId) {
+		eventRepository.deleteById(eventId);
+	}
+
+	@Override
+	public List<MeaningFulEvent> saveEvent(List<MeaningFulEvent> event) {
+		return eventRepository.saveAll(event);
+	}
+
+	@Override
+	public List<MeaningFulEvent> findEventsBySuggestionType(SuggestionType suggestion) {
+		return eventRepository.findBySuggestion(suggestion, sort);
+	}
+
+	@Override
+	public List<MeaningFulEvent> findEventsByCategoryType(CategoryType category) {
+		return eventRepository.findByCategory(category, sort);
+	}
+
+	@Override
+	public List<MeaningFulEvent> findEventsbyFilter(SuggestionType suggestion, CategoryType category) {
+		return eventRepository.findBySuggestionAndCategory(suggestion, category, sort);
 	}
 }

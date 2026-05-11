@@ -3,23 +3,42 @@ package com.example.fsetraining.Project1.domain.event;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
+@Entity
+@Table(name="events")
 public class MeaningFulEvent {
 
-	private EventId id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
 	private String title;
 	private String description;
 	private LocalDateTime eventDateTime;
 	
+	@Enumerated(EnumType.STRING)
+	private SuggestionType suggestion;
+	
+	@Enumerated(EnumType.STRING)
+	private CategoryType category;
+	
+	public MeaningFulEvent() {}
 
-	public MeaningFulEvent(EventId id,
+	public MeaningFulEvent(Long id,
 	                           String title,
 	                           String description,
-	                           LocalDateTime eventDateTime) {
+	                           LocalDateTime eventDateTime,
+	                           SuggestionType suggestion,
+	                           CategoryType category) {
 	
 	        if (title == null || title.isBlank()) {
 	            throw new IllegalArgumentException("Event title cannot be empty");
@@ -29,12 +48,9 @@ public class MeaningFulEvent {
 	        this.title = title;
 	        this.description = description;
 	        this.eventDateTime = eventDateTime;
+	        this.suggestion = suggestion;
+	        this.category = category;
 	    }
-	
-	public EventId getId() {
-		return id;
-	}
-		
 	
 	@Override
 	public boolean equals(Object o) {
