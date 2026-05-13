@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,6 +23,7 @@ import com.example.fsetraining.Project1.domain.event.SuggestionType;
 import com.example.fsetraining.Project1.service.EventService;
 
 @RestController
+@RequestMapping("/events")
 public class EventController {
 	
 	
@@ -32,7 +34,7 @@ public class EventController {
 		this.eventService = eventService;
 	}
 	
-	@GetMapping("/events")
+	@GetMapping
 	public ResponseEntity<List<MeaningFulEvent>> getEventBetweenDate(
 			@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
 			LocalDate fromDate , 
@@ -65,7 +67,7 @@ public class EventController {
 		return ResponseEntity.ok(saveEvent);
 	}
 	
-	@GetMapping("/event/{eventId}")
+	@GetMapping("/{eventId}")
 	public ResponseEntity<MeaningFulEvent> getEventById(@PathVariable Long eventId) {		
 		MeaningFulEvent event = eventService.getEventById(eventId);
 		return ResponseEntity.ok(event);
@@ -77,19 +79,19 @@ public class EventController {
 		return ResponseEntity.noContent().build();
 	}
 
-	@GetMapping("/events/by-suggestion/{suggestion}")
+	@GetMapping("/by-suggestion/{suggestion}")
 	public ResponseEntity<List<MeaningFulEvent>> findEventBySuggestionType(@PathVariable SuggestionType suggestion) {
 		List<MeaningFulEvent> events = eventService.findEventsBySuggestionType(suggestion);
 		return ResponseEntity.ok(events);
 	}
 	
-	@GetMapping("/events/by-category/{category}")
+	@GetMapping("/by-category/{category}")
 	public ResponseEntity<List<MeaningFulEvent>> findEventBySuggestionType(@PathVariable CategoryType category) {
 		List<MeaningFulEvent> events = eventService.findEventsByCategoryType(category);
 		return ResponseEntity.ok(events);
 	}
 	
-	@GetMapping("/events/filter/{suggestion}/{category}")
+	@GetMapping("/filter/{suggestion}/{category}")
 	public ResponseEntity<List<MeaningFulEvent>> findEventsbyFilter(@PathVariable SuggestionType suggestion,
 			@PathVariable CategoryType category) {
 		List<MeaningFulEvent> events = eventService.findEventsbyFilter(suggestion, category);
